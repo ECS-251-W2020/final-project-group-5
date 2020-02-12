@@ -1,4 +1,4 @@
-#Week 1 Summary
+# Week 1 Summary
 <strong>Activities in the past week:</strong> We all together worked on drafting the project proposal. Prior to it, we had a brief session of 2 hours where each one of use convinced one other what we plan to do for this research project. Finally, we created the first draft shortly after this meeting. Upon proofreading, we were unhappy with a couple of paragraphs and then fixed them until we were satisfied.
 We created a board on [Trello](https://trello.com/b/jXv54U3m/ecs-251-project) to structure our planning. Also, joined the [GitHub](https://github.com/ECS-251-W2020/final-project-group-5) project group for ECS 251.
 
