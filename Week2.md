@@ -14,4 +14,4 @@ creation is not absolutely clear in the paper.
 <strong>Issues:</strong>
 
 <strong>Current Throughput</strong>
-Reports for the normal execution can be found [here](https://github.com/ECS-251-W2020/final-project-group-5/blob/master/report.txt)
+Reports for the normal execution can be found [here](https://github.com/ECS-251-W2020/final-project-group-5/blob/master/intialBenchmark.txt)
