@@ -1,0 +1,46 @@
+Setting 4 nodes, 1 Client.
+Docker Implementation
+
+Throughputs:
+0: 14922
+1: 14849
+2: 15129
+3: 14937
+4: 14939
+Latencies:
+latency 4: 1.344437
+
+idle times:
+Idleness of node: 0
+Worker THD 0: 118.881
+Worker THD 1: 98.1922
+Worker THD 2: 97.9185
+Worker THD 3: 0.41619
+Worker THD 4: 101.845
+Idleness of node: 1
+Worker THD 0: 89.0082
+Worker THD 1: 0.00000
+Worker THD 2: 0.00000
+Worker THD 3: 0.00000
+Worker THD 4: 102.366
+Idleness of node: 2
+Worker THD 0: 89.2582
+Worker THD 1: 0.00000
+Worker THD 2: 0.00000
+Worker THD 3: 0.55710
+Worker THD 4: 105.031
+Idleness of node: 3
+Worker THD 0: 88.9147
+Worker THD 1: 0.00000
+Worker THD 2: 0.00000
+Worker THD 3: 0.00000
+Worker THD 4: 102.244
+Memory:
+0: 141 MB
+1: 133 MB
+2: 149 MB
+3: 142 MB
+4: 333 MB
+
+avg thp: 4: 14959
+avg lt : 1: 1.344
