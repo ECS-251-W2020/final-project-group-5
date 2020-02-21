@@ -1233,6 +1233,7 @@ uint64_t BatchRequests::get_size()
 void BatchRequests::init(uint64_t thd_id)
 {
 	// Only primary should create this message
+	// Change assert for sharding
 	assert(is_primary_node(0, g_node_id));
 	this->view = get_current_view(thd_id);
 

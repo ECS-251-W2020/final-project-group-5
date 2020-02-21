@@ -1216,10 +1216,13 @@ void WorkerThread::create_and_send_batchreq(ClientQueryBatch *msg, uint64_t tid)
         {
             continue;
         }
+
+        // added for sharding
         if (!is_in_same_shard(i, g_node_id))
         {
             continue;
         }
+        // end
         breq->sign(i);
         tman->allsign.push_back(breq->signature); // Redundant
         emptyvec.push_back(breq->signature);

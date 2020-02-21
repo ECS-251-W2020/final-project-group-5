@@ -443,6 +443,7 @@ void TxnManager::send_pbft_prep_msgs()
         {
             continue;
         }
+        // added for sharding
         if (!is_in_same_shard(i, g_node_id))
         {
             continue;
@@ -478,6 +479,8 @@ void TxnManager::send_pbft_commit_msgs()
         {
             continue;
         }
+
+        // added for sharding
         if (!is_in_same_shard(i, g_node_id))
         {
             continue;
