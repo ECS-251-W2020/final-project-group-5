@@ -5,9 +5,8 @@
 3. Decided how cross shard transactions would work.
 
 <strong>Activities planned for this week:</strong>
-1. Start working on Reference Committee
+1. Start working on Reference Committee.
 2. Cross shard transactions.
-3. Evaluate throughput and compare with previous results on GCP.
 
 <strong>Issues:</strong>
 1. No blockers as of now
