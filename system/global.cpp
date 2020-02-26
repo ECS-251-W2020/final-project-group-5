@@ -183,7 +183,8 @@ bool keyAvail = false;
 uint64_t totKey = 0;
 
 uint64_t indexSize = 2 * g_client_node_cnt * g_inflight_max;
-uint64_t g_min_invalid_nodes = (g_node_cnt - 1) / 3; //min number of valid nodes
+//Number of invalid/faulty nodes
+uint64_t g_min_invalid_nodes = (g_shard_size - 1) / 2;
 
 // Funtion to calculate hash of a string.
 string calculateHash(string str)

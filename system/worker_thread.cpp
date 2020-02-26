@@ -1228,8 +1228,8 @@ void WorkerThread::create_and_send_batchreq(ClientQueryBatch *msg, uint64_t tid)
         emptyvec.push_back(breq->signature);
     }
 
-    // Send the BatchRequests message to all the other replicas.
-    vector<uint64_t> dest = nodes_to_send(0, g_node_cnt);
+    // Send the BatchRequests message to all the other replicas in the same shard.
+    vector<uint64_t> dest = nodes_to_send(g_node_id, g_node_id + g_shard_size);
     msg_queue.enqueue(get_thd_id(), breq, emptyvec, dest);
     emptyvec.clear();
 }
