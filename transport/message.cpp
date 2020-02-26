@@ -550,6 +550,11 @@ void ClientQueryMessage::init()
 	first_startts = 0;
 }
 
+void ClientQueryMessageSharding::init()
+{
+	 inter_shard_flag = false;
+}
+
 void ClientQueryMessage::release()
 {
 	partitions.release();

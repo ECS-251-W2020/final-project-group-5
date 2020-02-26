@@ -159,6 +159,15 @@ public:
     Array<uint64_t> partitions;
 };
 
+class ClientQueryMessageSharding : public ClientQueryMessage
+{
+public:
+    bool inter_shard_flag = false;
+    vector<uint64_t> shards_involved;
+
+};
+
+
 class YCSBClientQueryMessage : public ClientQueryMessage
 {
 public:
