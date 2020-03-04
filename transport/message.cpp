@@ -120,6 +120,18 @@ Message *Message::create_message(RemReqType rtype)
 	case BATCH_REQ:
 		msg = new BatchRequests;
 		break;
+	case REQUEST_2PC:
+		msg = new Request_2PCBatch;
+		break;
+	case VOTE_2PC:
+		msg = new Vote_2PC;
+		break;
+	case COMMIT_2PC:
+		msg = new Commit_2PC;
+		break;
+	case ABORT_2PC:
+		msg = new Abort_2PC;
+		break;
 
 #if VIEW_CHANGES == true
 	case VIEW_CHANGE:
@@ -441,6 +453,8 @@ void YCSBClientQueryMessage::release()
 		}
 	}
 	requests.release();
+	// Release shards
+	shards_involved.release();
 }
 
 uint64_t YCSBClientQueryMessage::get_size()
@@ -451,6 +465,10 @@ uint64_t YCSBClientQueryMessage::get_size()
 	size += sizeof(size_t);
 	size += sizeof(ycsb_request) * requests.size();
 	size += sizeof(return_node);
+	//Add shard request information to the message size
+	size += sizeof(cross_shard_txn);
+	size += sizeof(size_t);
+	size += sizeof(uint64_t) * shards_involved.size();
 
 	return size;
 }
@@ -458,12 +476,16 @@ uint64_t YCSBClientQueryMessage::get_size()
 void YCSBClientQueryMessage::copy_from_query(BaseQuery *query)
 {
 	ClientQueryMessage::copy_from_query(query);
+	// Following similar implementation as ClientQueryMessage::copy_from_query
+	shards_involved.clear();
 	requests.copy(((YCSBQuery *)(query))->requests);
 }
 
 void YCSBClientQueryMessage::copy_from_txn(TxnManager *txn)
 {
 	ClientQueryMessage::mcopy_from_txn(txn);
+	// Following similar implementation as ClientQueryMessage::copy_from_query
+	shards_involved.clear();
 	requests.copy(((YCSBQuery *)(txn->query))->requests);
 }
 
@@ -494,8 +516,18 @@ void YCSBClientQueryMessage::copy_from_buf(char *buf)
 		requests.add(req);
 	}
 
+	COPY_VAL(cross_shard_txn, buf, ptr);
+	size_t sizeOfShards;
+	COPY_VAL(sizeOfShards, buf, ptr);
+	shards_involved.init(sizeOfShards);
+	for(uint64_t i = 0; i < sizeOfShards; i++)
+	{
+		DEBUG_M("YCSBClientQueryMessage::copy ycsb_request alloc shards\n");
+		uint64_t shard;
+		COPY_VAL(shard, buf, ptr);
+		shards_involved.add(shard);
+	}
 	COPY_VAL(return_node, buf, ptr);
-
 	assert(ptr == get_size());
 }
 
@@ -513,6 +545,17 @@ void YCSBClientQueryMessage::copy_to_buf(char *buf)
 		COPY_BUF(buf, *req, ptr);
 	}
 
+	//Copy sharding related flag and array to buffer
+	COPY_BUF(buf, cross_shard_txn, ptr);
+	size_t sizeOfShards = shards_involved.size();
+	//cout<<"Size of shard: "<<sizeOfShards<<endl;
+	COPY_BUF(buf, sizeOfShards, ptr);
+	for (uint64_t i = 0; i < sizeOfShards; i++)
+	{
+		uint64_t shard = shards_involved[i];
+		COPY_BUF(buf, shard, ptr);
+	}
+	//End of copy
 	COPY_BUF(buf, return_node, ptr);
 
 	assert(ptr == get_size());
@@ -550,11 +593,6 @@ void ClientQueryMessage::init()
 	first_startts = 0;
 }
 
-void ClientQueryMessageSharding::init()
-{
-	 inter_shard_flag = false;
-}
-
 void ClientQueryMessage::release()
 {
 	partitions.release();
@@ -567,6 +605,8 @@ uint64_t ClientQueryMessage::get_size()
 	size += sizeof(client_startts);
 	size += sizeof(size_t);
 	size += sizeof(uint64_t) * partitions.size();
+	//size += sizeof(cross_shard_txn);
+	//size += sizeof(uint64_t) * shards_involved.size();
 	return size;
 }
 
