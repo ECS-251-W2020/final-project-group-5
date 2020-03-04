@@ -14,6 +14,7 @@ Reference Committee
 1. Handle Request_2PC when received by other shard
 2. Sending of Vote_2PC back to Reference Committee
 3. Perform Global Commit to complete inter shard transaction
+4. Start drafting the Project Report and Prepare Presentation
 
 <strong>Issues:</strong>
 1. No blockers as of now
