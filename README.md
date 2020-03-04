@@ -17,6 +17,6 @@ permissioned blockchain systems. We would achieve this by implementing a shardin
 
 ## Note
 For checking user commits please use 
-[DhruvKrishFork](https://github.com/DhruvKrish/resilientdb/tree/AHL)
-This would also show the exact difference when compared to ResilientDB Master.
+[DhruvKrishFork](https://github.com/DhruvKrish/resilientdb/tree/AHL)<br>
+This would also show the exact difference when compared to ResilientDB Master.<br>
 We maintain this branch so as to avoid rework when merging with Master.
