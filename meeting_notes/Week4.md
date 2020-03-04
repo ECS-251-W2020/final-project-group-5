@@ -1,4 +1,4 @@
-# Week 3 Summary
+# Week 4 Summary
 <strong>Activities in the past week:</strong>
 1. Completed the outer implementation of Reference Committee
 2. Segregated the inter shard transaction core logic from intra shard
