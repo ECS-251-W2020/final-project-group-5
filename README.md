@@ -14,5 +14,9 @@ permissioned blockchain systems. We would achieve this by implementing a shardin
 ## Important Links
 1. [ResilientDB](https://resilientdb.com/)
 2. [TrelloBoard](https://trello.com/b/jXv54U3m/ecs-251-project)
-3. For checking user commit please use 
+
+## NOTE
+For checking user commits please use 
 [DhruvKrishFork](https://github.com/DhruvKrish/resilientdb/tree/AHL)
+This would also show the exact difference when compared to ResilientDB Master.
+We maintain this branch so as to avoid rework when merging with Master.
