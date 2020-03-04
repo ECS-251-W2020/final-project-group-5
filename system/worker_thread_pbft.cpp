@@ -28,10 +28,10 @@
  */
 RC WorkerThread::process_client_batch(Message *msg)
 {
-    ClientQueryBatch *clbtch = (ClientQueryBatch *)msg;
+    //printf("ClientQueryBatch: %ld, THD: %ld :: CL: %ld :: RQ: %ld\n",msg->txn_id, get_thd_id(), msg->return_node_id, clbtch->cqrySet[0]->requests[0]->key);
+    //fflush(stdout);
 
-    printf("ClientQueryBatch: %ld, THD: %ld :: CL: %ld :: RQ: %ld\n",msg->txn_id, get_thd_id(), msg->return_node_id, clbtch->cqrySet[0]->requests[0]->key);
-    fflush(stdout);
+    ClientQueryBatch *clbtch = (ClientQueryBatch *)msg;
 
     // Authenticate the client signature.
     validate_msg(clbtch);
