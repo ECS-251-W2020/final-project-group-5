@@ -157,16 +157,9 @@ public:
     uint64_t client_startts;
     uint64_t first_startts;
     Array<uint64_t> partitions;
+    //bool cross_shard_txn;
+    //Array<uint64_t> shards_involved;
 };
-
-class ClientQueryMessageSharding : public ClientQueryMessage
-{
-public:
-    bool inter_shard_flag = false;
-    vector<uint64_t> shards_involved;
-
-};
-
 
 class YCSBClientQueryMessage : public ClientQueryMessage
 {
@@ -187,6 +180,11 @@ public:
     string getRequestString();
 
     Array<ycsb_request *> requests;
+
+    //This ClientQuery Message is a cross-shard transacton if cross_shard_txn is set
+    bool cross_shard_txn;
+    //List of shards involved in the cross-shard transaction
+    Array<uint64_t> shards_involved;
 };
 
 class ClientResponseMessage : public Message
@@ -236,6 +234,27 @@ public:
     Array<YCSBClientQueryMessage *> cqrySet;
 };
 #endif
+
+class Request_2PCBatch : public ClientQueryBatch
+{
+
+};
+
+class Vote_2PC : public ClientQueryBatch
+{
+
+};
+
+class Commit_2PC : public ClientQueryBatch
+{
+
+};
+
+class Abort_2PC : public ClientQueryBatch
+{
+
+};
+
 
 class QueryMessage : public Message
 {
