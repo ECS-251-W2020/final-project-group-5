@@ -103,8 +103,53 @@ void WorkerThread::process(Message *msg)
         rc = process_pbft_chkpt_msg(msg);
         break;
     case EXECUTE_MSG:
+        {
+        TxnManager *txn_man = get_transaction_manager(msg->txn_id, 0);
+        /*
+        //Verifying that sharding information is persisted in Txn manager
+        cout<< "In Execute:"<<endl;
+        
+        if(txn_man->return_id >= g_node_cnt){
+        cout<< "Client request originated from:"<<txn_man->return_id - g_node_cnt<<endl;
+        }
+        cout<<"Cross shard? : "<<txn_man->get_cross_shard_txn()<<endl;
+        Array<uint64_t> shards_involved_in_txn= txn_man->get_shards_involved();
+        cout<<"Shards Involved list : "<<endl;
+        for ( uint64_t i =0; i<shards_involved_in_txn.size();i++)
+        {
+        cout<<shards_involved_in_txn[i]<<endl;
+        }
+        */
+        Array<uint64_t> shardsInvolved = txn_man->get_shards_involved();
+
+        //if Request orginated form client and it is a cross shard transaction (current node can only be reference commitee)
+        if((txn_man->return_id > g_node_cnt) && (txn_man->get_cross_shard_txn()))
+        {
+           //create and send PREPARE_2PC_REQ message to the shards involved
+           create_and_send_PREPARE_2PC(msg);
+        }
+        //If current node is reference commitee & request originated from another shard
+        else if(g_node_id < g_shard_size && txn_man->return_id>=g_shard_size && txn_man->return_id<g_node_cnt) 
+        {
+            //create and send global commit/abort to shards involved
+            
+            //if ref committee also part of shards involved, then execute
+            if(shardsInvolved.contains(0))
+            {
+            rc = process_execute_msg(msg); 
+            }
+        }
+        //if current node is in of the shards involved and request originated from Ref. commitee:
+        else if(g_node_id>g_shard_size and g_node_id<g_node_cnt and txn_man->return_id < g_shard_size)
+        {
+            //create and send Vote_2PC
+        }
+        else //Intra shard : regular Execution
+        {
         rc = process_execute_msg(msg);
+        }
         break;
+        }
 #if VIEW_CHANGES
     case VIEW_CHANGE:
         rc = process_view_change_msg(msg);
@@ -126,6 +171,46 @@ void WorkerThread::process(Message *msg)
         break;
     }
 }
+
+
+RC WorkerThread::create_and_send_PREPARE_2PC(Message *msg)
+{
+  
+    Message *mssg = Message::create_message(REQUEST_2PC);
+    Request_2PCBatch *rmsg = (Request_2PCBatch *)mssg;
+	rmsg->init();
+
+    TxnManager *txn_man = get_transaction_manager(msg->txn_id, 0);
+
+    //Array<YCSBClientQueryMessage *> client_query_set = txn_man->batchreq->requestMsg;
+
+    //add signing to rmsg
+    //rmsg -> sign(pass destination)
+    vector<string> emptyvec;
+	//populate emptyvec
+    //emptyvec.push_back(rmsg->signature);
+
+	vector<uint64_t> dest;
+
+    Array<uint64_t> shardsInvolved = txn_man->get_shards_involved();
+
+    for (uint64_t i=0; i<shardsInvolved.size(); i++)
+        {
+            for(uint64_t j=shardsInvolved[i]; j<shardsInvolved[i]+g_shard_size; j++)
+            {
+                dest.push_back(j);
+            }               
+        }
+    //enqueue to msg_queue
+	//msg_queue.enqueue(get_thd_id(), bmsg, emptyvec, dest);
+	dest.clear();
+
+    return RCOK;  
+}
+
+
+
+
 
 RC WorkerThread::process_key_exchange(Message *msg)
 {
@@ -771,6 +856,17 @@ void WorkerThread::init_txn_man(YCSBClientQueryMessage *clqry)
 {
     txn_man->client_id = clqry->return_node;
     txn_man->client_startts = clqry->client_startts;
+    //Check if request is a cross shard transaction
+    if(clqry->cross_shard_txn){
+        //Set cross shard transaction bool of transaction
+        txn_man->set_cross_shard_txn();
+        //Initialize shard list with size of shard list in message
+        txn_man->init_shards_involved(clqry->shards_involved.size());
+        //Copy transaction list from message to transaction in TxnManager
+        for(uint64_t i=0;i<clqry->shards_involved.size();i++){
+            txn_man->set_shards_involved(clqry->shards_involved.get(i));
+        }
+    }
 
     YCSBQuery *query = (YCSBQuery *)(txn_man->query);
     for (uint64_t i = 0; i < clqry->requests.size(); i++)
@@ -1172,6 +1268,26 @@ void WorkerThread::create_and_send_batchreq(ClientQueryBatch *msg, uint64_t tid)
         algorithm_specific_update(msg, i);
 
         init_txn_man(msg->cqrySet[i]);
+
+        //Check if cross_shard_txn is set
+        /* if(msg->cqrySet[i]->cross_shard_txn){
+            cout<<"Inter Shard Flag set\n";
+            fflush(stdout);
+        } */
+
+        //Print shard list
+        /* cout<<"List of shards in transaction ID:"<<txn_id<<"\n";
+        fflush(stdout);
+        for(uint64_t j=0;j<msg->cqrySet[i]->shards_involved.size();j++){
+            cout<<msg->cqrySet[i]->shards_involved[j]<<"\n";
+            fflush(stdout);
+        } */
+
+        /* if(msg->cqrySet[i]->shards_involved.size()==0){
+            cout<<"No shards in list\n";
+            fflush(stdout);
+        } */
+
 
         // Append string representation of this txn.
         batchStr += msg->cqrySet[i]->getString();
